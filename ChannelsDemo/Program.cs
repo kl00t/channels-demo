@@ -5,13 +5,19 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHostedService<Processor>();
 
-
+//builder.Services.AddSingleton<Channel<ChannelRequest>>(
+//    _ => Channel.CreateUnbounded<ChannelRequest>(new UnboundedChannelOptions
+//    {
+//        SingleReader = true,
+//        AllowSynchronousContinuations = false,
+//    }));
 
 builder.Services.AddSingleton<Channel<ChannelRequest>>(
-    _ => Channel.CreateUnbounded<ChannelRequest>(new UnboundedChannelOptions
+    _ => Channel.CreateBounded<ChannelRequest>(new BoundedChannelOptions(1)
     {
-        SingleReader = true,
-        AllowSynchronousContinuations = false,
+        FullMode = BoundedChannelFullMode.Wait,
+        SingleWriter = true,
+        AllowSynchronousContinuations = false
     }));
 
 var app = builder.Build();
